@@ -142,11 +142,11 @@ public class AnsiHtmlOutputStream extends AnsiOutputStream {
     public void write(int data) throws IOException {
         // This little state machine only exists to handle embedded notes from other sources, whereas
         // the preamble is an ANSI escape sequence itself.
-
+        
         if (state == State.INIT) {
             Integer defaultFg = colorMap.getDefaultForeground();
             Integer defaultBg = colorMap.getDefaultBackground();
-
+            
             if (defaultFg != null || defaultBg != null) {
                 openTag(new AnsiAttributeElement(AnsiAttrType.DEFAULT, "div", "style=\"" +
                         (defaultBg != null ? "background-color: " + colorMap.getNormal(defaultBg) + ";" : "") +
@@ -164,6 +164,9 @@ public class AnsiHtmlOutputStream extends AnsiOutputStream {
                     collectAmbleCharacter(data, ConsoleNote.PREAMBLE);
                 } else {
                     super.write(data);
+                    if (data==10) {
+                        state = State.INIT;
+                    }
                 }
                 break;
             case NOTE:
